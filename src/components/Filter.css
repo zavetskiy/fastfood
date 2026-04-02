@@ -1,0 +1,125 @@
+.filter-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.filter-wrap {
+  position: relative;
+}
+
+.filter-btn {
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text-primary);
+  border-radius: var(--radius-md);
+  padding: 10px 14px;
+  min-width: 130px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  transition: all var(--transition);
+  box-shadow: var(--shadow-sm);
+}
+
+.filter-btn:hover {
+  border-color: var(--primary);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+.filter-btn:active {
+  transform: translateY(0);
+}
+
+.filter-caret {
+  font-size: 10px;
+  color: var(--text-secondary);
+  transition: transform var(--transition);
+}
+
+.filter-btn:hover .filter-caret {
+  transform: rotate(180deg);
+}
+
+.filter-apply {
+  border: none;
+  background: var(--secondary);
+  color: white;
+  border-radius: var(--radius-md);
+  height: 42px;
+  padding: 0 20px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--transition);
+}
+
+.filter-apply:hover {
+  background: var(--secondary-light);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.filter-apply:active {
+  transform: translateY(0);
+}
+
+.filter-list {
+  margin: 0;
+  padding: 6px;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  background: var(--surface);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+}
+
+.filter-option {
+  width: 100%;
+  border: none;
+  background: transparent;
+  border-radius: var(--radius-sm);
+  text-align: left;
+  padding: 10px 14px;
+  cursor: pointer;
+  color: var(--text-primary);
+  font-size: 14px;
+  transition: all var(--transition);
+}
+
+.filter-option:hover {
+  background: var(--primary-light);
+  color: var(--primary);
+}
+
+.filter-option.active {
+  background: var(--primary);
+  color: white;
+  font-weight: 500;
+}
+
+@media (max-width: 640px) {
+  .filter-row {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .filter-btn {
+    min-width: 110px;
+    padding: 8px 12px;
+    font-size: 13px;
+  }
+
+  .filter-apply {
+    height: 38px;
+    padding: 0 16px;
+    font-size: 13px;
+  }
+}
