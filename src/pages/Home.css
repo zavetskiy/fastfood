@@ -4,9 +4,31 @@
 }
 
 .container {
-  max-width: 1280px;
+  max-width: 1400px;
   margin: 0 auto;
   padding: 40px 32px 100px;
+}
+
+.hero {
+  text-align: center;
+  padding: 60px 0 48px;
+}
+
+.hero-title {
+  margin: 0 0 12px;
+  font-size: 42px;
+  font-weight: 700;
+  color: var(--secondary);
+  letter-spacing: -1px;
+  line-height: 1.2;
+}
+
+.hero-subtitle {
+  margin: 0;
+  font-size: 18px;
+  color: var(--text-secondary);
+  max-width: 500px;
+  margin: 0 auto;
 }
 
 .toolbar {
@@ -14,7 +36,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  margin-bottom: 48px;
+  margin-bottom: 40px;
   flex-wrap: wrap;
 }
 
@@ -44,32 +66,46 @@
 }
 
 .state-message.error {
-  color: #dc3545;
-  border-color: #f5c6cb;
-  background: #fff5f5;
+  color: var(--danger);
+  border-color: var(--danger);
+  background: #fef2f2;
 }
 
 .cart-panel-overlay {
   position: fixed;
   inset: 0;
   z-index: 200;
+  background: rgba(15, 23, 42, 0.5);
+  backdrop-filter: blur(4px);
 }
 
 .cart-panel-inner {
   position: absolute;
   top: 84px;
-  right: calc(50% - 640px);
+  right: calc(50% - 700px);
   max-width: 100%;
   z-index: 201;
 }
 
-@media (max-width: 1300px) {
+@media (max-width: 1400px) {
   .cart-panel-inner {
-    right: 20px;
+    right: 32px;
   }
 }
 
 @media (max-width: 900px) {
+  .hero {
+    padding: 40px 0 32px;
+  }
+
+  .hero-title {
+    font-size: 32px;
+  }
+
+  .hero-subtitle {
+    font-size: 16px;
+  }
+
   .container {
     padding: 32px 20px 80px;
   }
@@ -86,6 +122,18 @@
 }
 
 @media (max-width: 640px) {
+  .hero {
+    padding: 32px 0 24px;
+  }
+
+  .hero-title {
+    font-size: 26px;
+  }
+
+  .hero-subtitle {
+    font-size: 14px;
+  }
+
   .container {
     padding: 24px 16px 60px;
   }

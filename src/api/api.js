@@ -1,19 +1,17 @@
-const API_URL = 'https://prowebtech.uz/api/v1/products'
+import axios from 'axios'
+
+const API_URL = 'https://dummyjson.com/products'
+const LIMIT = 12
 
 export async function getProducts() {
-  const allProducts = []
-  let nextUrl = API_URL
-
-  while (nextUrl) {
-    const response = await fetch(nextUrl)
-    if (!response.ok) {
-      throw new Error('Не удалось загрузить товары. Попробуйте позже.')
-    }
-
-    const data = await response.json()
-    allProducts.push(...(Array.isArray(data.results) ? data.results : []))
-    nextUrl = data.next ? data.next.replace('http://', 'https://') : null
+  try {
+    const response = await axios.get(API_URL, {
+      params: { limit: LIMIT },
+    })
+    return response.data.products
+  } catch (error) {
+    throw new Error(
+      error.response?.data?.message || 'Не удалось загрузить товары. Попробуйте позже.'
+    )
   }
-
-  return allProducts
 }

@@ -1,98 +1,68 @@
-import { createContext, createElement, useContext, useMemo, useReducer } from 'react'
+import { create } from 'zustand'
+import { persist } from 'zustand/middleware'
 
-const STORAGE_KEY = 'nike_cart_items'
-const CartContext = createContext(null)
+const STORAGE_KEY = 'techstore_cart_items'
 
-function readInitialState() {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY)
-    if (!raw) return { items: [] }
-    const parsed = JSON.parse(raw)
-    return { items: Array.isArray(parsed) ? parsed : [] }
-  } catch {
-    return { items: [] }
-  }
-}
+export const useCartStore = create(
+  persist(
+    (set, get) => ({
+      items: [],
+      totalCount: 0,
 
-function cartReducer(state, action) {
-  switch (action.type) {
-    case 'ADD_ITEM': {
-      const product = action.payload
-      const existing = state.items.find((item) => item.id === product.id)
+      addToCart: (product) => {
+        const items = get().items
+        const existing = items.find((item) => item.id === product.id)
 
-      if (existing) {
-        return {
-          ...state,
-          items: state.items.map((item) =>
-            item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item,
-          ),
+        if (existing) {
+          set({
+            items: items.map((item) =>
+              item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item
+            ),
+            totalCount: get().totalCount + 1,
+          })
+        } else {
+          set({
+            items: [...items, { ...product, quantity: 1 }],
+            totalCount: get().totalCount + 1,
+          })
         }
-      }
+      },
 
-      return {
-        ...state,
-        items: [...state.items, { ...product, quantity: 1 }],
-      }
-    }
-    case 'REMOVE_ITEM': {
-      return {
-        ...state,
-        items: state.items.filter((item) => item.id !== action.payload),
-      }
-    }
-    case 'DECREASE_ITEM': {
-      const existing = state.items.find((item) => item.id === action.payload)
-      if (!existing) return state
-
-      if (existing.quantity <= 1) {
-        return {
-          ...state,
-          items: state.items.filter((item) => item.id !== action.payload),
+      removeFromCart: (id) => {
+        const items = get().items
+        const item = items.find((i) => i.id === id)
+        if (item) {
+          set({
+            items: items.filter((i) => i.id !== id),
+            totalCount: Math.max(0, get().totalCount - item.quantity),
+          })
         }
-      }
+      },
 
-      return {
-        ...state,
-        items: state.items.map((item) =>
-          item.id === action.payload ? { ...item, quantity: item.quantity - 1 } : item,
-        ),
-      }
+      decreaseItem: (id) => {
+        const items = get().items
+        const existing = items.find((item) => item.id === id)
+        if (!existing) return
+
+        if (existing.quantity <= 1) {
+          get().removeFromCart(id)
+        } else {
+          set({
+            items: items.map((item) =>
+              item.id === id ? { ...item, quantity: item.quantity - 1 } : item
+            ),
+            totalCount: get().totalCount - 1,
+          })
+        }
+      },
+
+      clearCart: () => {
+        set({ items: [], totalCount: 0 })
+      },
+    }),
+    {
+      name: STORAGE_KEY,
+      partialize: (state) => ({ items: state.items }),
     }
-    default:
-      return state
-  }
-}
-
-export function CartProvider({ children }) {
-  const [state, dispatch] = useReducer(cartReducer, undefined, readInitialState)
-
-  const value = useMemo(() => {
-    const totalCount = state.items.reduce((sum, item) => sum + item.quantity, 0)
-
-    return {
-      items: state.items,
-      totalCount,
-      addToCart: (product) => dispatch({ type: 'ADD_ITEM', payload: product }),
-      removeFromCart: (id) => dispatch({ type: 'REMOVE_ITEM', payload: id }),
-      decreaseItem: (id) => dispatch({ type: 'DECREASE_ITEM', payload: id }),
-    }
-  }, [state.items])
-
-  return createElement(CartContext.Provider, { value }, children)
-}
-
-export function useCart() {
-  const context = useContext(CartContext)
-  if (!context) {
-    throw new Error('useCart должен использоваться внутри CartProvider')
-  }
-  return context
-}
-
-export function persistCart(items) {
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(items))
-  } catch {
-    // ignore write errors
-  }
-}
+  )
+)

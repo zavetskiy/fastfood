@@ -3,9 +3,13 @@ import './Filter.css'
 
 const OPTIONS = [
   { key: 'all', label: 'Все товары' },
-  { key: 'burger', label: 'Бургеры' },
-  { key: 'pizza', label: 'Пицца' },
-  { key: 'lavash', label: 'Лаваш' },
+  { key: 'smartphones', label: 'Смартфоны' },
+  { key: 'laptops', label: 'Ноутбуки' },
+  { key: 'audio', label: 'Аудио' },
+  { key: 'skincare', label: 'Косметика' },
+  { key: 'fragrances', label: 'Духи' },
+  { key: 'furniture', label: 'Мебель' },
+  { key: 'accessories', label: 'Аксессуары' },
 ]
 
 function Filter({ isOpen, activeFilter, onToggle, onSelect, onApply }) {
@@ -17,7 +21,9 @@ function Filter({ isOpen, activeFilter, onToggle, onSelect, onApply }) {
         <button className="filter-btn" type="button" onClick={onToggle}>
           {selectedLabel}
           <span aria-hidden="true" className="filter-caret">
-            ▼
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M6 9l6 6 6-6"/>
+            </svg>
           </span>
         </button>
 

@@ -4,15 +4,20 @@ import Filter from '../components/Filter'
 import Header from '../components/Header'
 import ProductList from '../components/ProductList'
 import CartPanel from '../components/CartPanel'
-import { persistCart, useCart } from '../store/cartStore'
+import { useCartStore } from '../store/cartStore'
 import './Home.css'
 
 function resolveCategory(product) {
-  const hint = `${product?.title ?? ''} ${product?.description ?? ''}`.toLowerCase()
-  if (hint.includes('burger') || hint.includes('бургер')) return 'burger'
-  if (hint.includes('pizza') || hint.includes('пицца')) return 'pizza'
-  if (hint.includes('lavash') || hint.includes('лаваш') || hint.includes('шаурма')) return 'lavash'
-  return 'burger'
+  const category = product.category?.toLowerCase() ?? ''
+  
+  if (category.includes('smartphone')) return 'smartphones'
+  if (category.includes('laptop')) return 'laptops'
+  if (category.includes('headphone') || category.includes('audio')) return 'audio'
+  if (category.includes('skincare')) return 'skincare'
+  if (category.includes('fragrance')) return 'fragrances'
+  if (category.includes('furniture')) return 'furniture'
+  if (category.includes('accessory')) return 'accessories'
+  return 'all'
 }
 
 function Home() {
@@ -24,7 +29,8 @@ function Home() {
   const [pendingFilter, setPendingFilter] = useState('all')
   const [animatedId, setAnimatedId] = useState(null)
   const [cartOpen, setCartOpen] = useState(false)
-  const { addToCart, totalCount, items, decreaseItem } = useCart()
+
+  const { addToCart, totalCount, items, decreaseItem } = useCartStore()
 
   useEffect(() => {
     async function loadProducts() {
@@ -33,7 +39,7 @@ function Home() {
         const list = await getProducts()
         setProducts(list)
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Ошибка загрузки')
+        setError(err.message)
       } finally {
         setLoading(false)
       }
@@ -41,10 +47,6 @@ function Home() {
 
     loadProducts()
   }, [])
-
-  useEffect(() => {
-    persistCart(items)
-  }, [items])
 
   const filteredProducts = useMemo(() => {
     if (activeFilter === 'all') return products
@@ -71,6 +73,11 @@ function Home() {
       <Header cartCount={totalCount} onToggleCart={() => setCartOpen((prev) => !prev)} />
 
       <main className="container">
+        <div className="hero">
+          <h1 className="hero-title">TechStore</h1>
+          <p className="hero-subtitle">Электроника, косметика, мебель и лучшие товары для дома</p>
+        </div>
+
         <div className="toolbar">
           <Filter
             isOpen={filterOpen}
