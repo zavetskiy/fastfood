@@ -5,11 +5,11 @@ const OPTIONS = [
   { key: 'all', label: 'Все товары' },
   { key: 'smartphones', label: 'Смартфоны' },
   { key: 'laptops', label: 'Ноутбуки' },
-  { key: 'audio', label: 'Аудио' },
-  { key: 'skincare', label: 'Косметика' },
   { key: 'fragrances', label: 'Духи' },
+  { key: 'skincare', label: 'Косметика' },
   { key: 'furniture', label: 'Мебель' },
-  { key: 'accessories', label: 'Аксессуары' },
+  { key: 'automotive', label: 'Автотовары' },
+  { key: 'home-decoration', label: 'Декор' },
 ]
 
 function Filter({ isOpen, activeFilter, onToggle, onSelect, onApply }) {

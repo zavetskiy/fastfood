@@ -1,32 +1,22 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { getProducts } from '../api/api'
 import Filter from '../components/Filter'
 import Header from '../components/Header'
 import ProductList from '../components/ProductList'
 import CartPanel from '../components/CartPanel'
+import Pagination from '../components/Pagination'
 import { useCartStore } from '../store/cartStore'
 import './Home.css'
 
-function resolveCategory(product) {
-  const category = product.category?.toLowerCase() ?? ''
-  
-  if (category.includes('smartphone')) return 'smartphones'
-  if (category.includes('laptop')) return 'laptops'
-  if (category.includes('headphone') || category.includes('audio')) return 'audio'
-  if (category.includes('skincare')) return 'skincare'
-  if (category.includes('fragrance')) return 'fragrances'
-  if (category.includes('furniture')) return 'furniture'
-  if (category.includes('accessory')) return 'accessories'
-  return 'all'
-}
-
 function Home() {
   const [products, setProducts] = useState([])
+  const [total, setTotal] = useState(0)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [filterOpen, setFilterOpen] = useState(false)
   const [activeFilter, setActiveFilter] = useState('all')
   const [pendingFilter, setPendingFilter] = useState('all')
+  const [currentPage, setCurrentPage] = useState(1)
   const [animatedId, setAnimatedId] = useState(null)
   const [cartOpen, setCartOpen] = useState(false)
 
@@ -36,8 +26,12 @@ function Home() {
     async function loadProducts() {
       try {
         setLoading(true)
-        const list = await getProducts()
-        setProducts(list)
+        const data = await getProducts({ 
+          category: activeFilter === 'all' ? '' : activeFilter, 
+          page: currentPage 
+        })
+        setProducts(data.products)
+        setTotal(data.total)
       } catch (err) {
         setError(err.message)
       } finally {
@@ -46,12 +40,7 @@ function Home() {
     }
 
     loadProducts()
-  }, [])
-
-  const filteredProducts = useMemo(() => {
-    if (activeFilter === 'all') return products
-    return products.filter((item) => resolveCategory(item) === activeFilter)
-  }, [products, activeFilter])
+  }, [activeFilter, currentPage])
 
   const handleBuy = (product) => {
     addToCart(product)
@@ -66,6 +55,12 @@ function Home() {
 
   const applyFilter = () => {
     setActiveFilter(pendingFilter)
+    setCurrentPage(1)
+  }
+
+  const handlePageChange = (page) => {
+    setCurrentPage(page)
+    window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
   return (
@@ -86,13 +81,20 @@ function Home() {
             onSelect={handleSelectFilter}
             onApply={applyFilter}
           />
-          <div className="total-box">Найдено: {filteredProducts.length} товаров</div>
+          <div className="total-box">Найдено: {total} товаров</div>
         </div>
 
         {loading && <p className="state-message">Загрузка товаров...</p>}
         {error && !loading && <p className="state-message error">{error}</p>}
         {!loading && !error && (
-          <ProductList products={filteredProducts} onBuy={handleBuy} animatedId={animatedId} />
+          <>
+            <ProductList products={products} onBuy={handleBuy} animatedId={animatedId} />
+            <Pagination 
+              currentPage={currentPage} 
+              totalItems={total} 
+              onPageChange={handlePageChange} 
+            />
+          </>
         )}
 
         {cartOpen && (
