@@ -1,18 +1,16 @@
 import Modal from './Modal'
+import { getCategoryLabel } from '../api/api'
 import './Filter.css'
 
-const OPTIONS = [
-  { key: 'all', label: 'Все товары' },
-  { key: 'smartphones', label: 'Смартфоны' },
-  { key: 'laptops', label: 'Ноутбуки' },
-  { key: 'fragrances', label: 'Духи' },
-  { key: 'skincare', label: 'Косметика' },
-  { key: 'furniture', label: 'Мебель' },
-  { key: 'automotive', label: 'Автотовары' },
-  { key: 'home-decoration', label: 'Декор' },
-]
+function Filter({ isOpen, activeFilter, onToggle, onSelect, onApply, categories = [] }) {
+  const OPTIONS = [
+    { key: 'all', label: 'Все товары' },
+    ...categories.map((cat) => ({
+      key: cat.slug,
+      label: getCategoryLabel(cat.slug),
+    })),
+  ]
 
-function Filter({ isOpen, activeFilter, onToggle, onSelect, onApply }) {
   const selectedLabel = OPTIONS.find((option) => option.key === activeFilter)?.label ?? 'Все товары'
 
   return (

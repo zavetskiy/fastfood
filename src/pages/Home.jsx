@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { getProducts } from '../api/api'
+import { getProducts, getCategories } from '../api/api'
 import Filter from '../components/Filter'
 import Header from '../components/Header'
 import ProductList from '../components/ProductList'
@@ -11,6 +11,7 @@ import './Home.css'
 function Home() {
   const [products, setProducts] = useState([])
   const [total, setTotal] = useState(0)
+  const [categories, setCategories] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [filterOpen, setFilterOpen] = useState(false)
@@ -21,6 +22,18 @@ function Home() {
   const [cartOpen, setCartOpen] = useState(false)
 
   const { addToCart, totalCount, items, decreaseItem } = useCartStore()
+
+  useEffect(() => {
+    async function loadCategories() {
+      try {
+        const cats = await getCategories()
+        setCategories(cats)
+      } catch (err) {
+        console.error('Не удалось загрузить категории:', err)
+      }
+    }
+    loadCategories()
+  }, [])
 
   useEffect(() => {
     async function loadProducts() {
@@ -80,6 +93,7 @@ function Home() {
             onToggle={() => setFilterOpen((prev) => !prev)}
             onSelect={handleSelectFilter}
             onApply={applyFilter}
+            categories={categories}
           />
           <div className="total-box">Найдено: {total} товаров</div>
         </div>

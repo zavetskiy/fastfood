@@ -23,3 +23,43 @@ export async function getProducts({ category = '', page = 1 } = {}) {
     )
   }
 }
+
+export async function getCategories() {
+  try {
+    const response = await axios.get(`${API_URL}/categories`)
+    return response.data
+  } catch {
+    throw new Error('Не удалось загрузить категории')
+  }
+}
+
+export const CATEGORY_LABELS = {
+  smartphones: 'Смартфоны',
+  laptops: 'Ноутбуки',
+  fragrances: 'Духи',
+  skincare: 'Уход за кожей',
+  groceries: 'Продукты',
+  'home-decoration': 'Декор для дома',
+  furniture: 'Мебель',
+  tops: 'Одежда',
+  automobiles: 'Автомобили',
+  automotive: 'Автотовары',
+  motorcycle: 'Мотоциклы',
+  vehicle: 'Транспорт',
+  sunglasses: 'Солнцезащитные очки',
+  'womens-jewellery': 'Украшения',
+  'womens-shoes': 'Женская обувь',
+  'mens-shirts': 'Мужские рубашки',
+  'mens-shoes': 'Мужская обувь',
+  'mens-watches': 'Мужские часы',
+  'womens-watches': 'Женские часы',
+  'womens-bags': 'Женские сумки',
+  'womens-dresses': 'Женские платья',
+  'mens-sneakers': 'Кроссовки',
+  'sports-accessories': 'Спортивные аксессуары',
+  beauty: 'Красота',
+}
+
+export function getCategoryLabel(slug) {
+  return CATEGORY_LABELS[slug] || slug.charAt(0).toUpperCase() + slug.slice(1).replace(/-/g, ' ')
+}
