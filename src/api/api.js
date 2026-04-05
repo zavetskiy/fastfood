@@ -1,12 +1,11 @@
 import axios from 'axios'
 
 const API_URL = 'https://dummyjson.com/products'
-const LIMIT = 12
 
-export async function getProducts({ category = '', page = 1 } = {}) {
+export async function getProducts({ category = '', page = 1, limit = 12 } = {}) {
   try {
-    const skip = (page - 1) * LIMIT
-    const params = { limit: LIMIT, skip }
+    const skip = (page - 1) * limit
+    const params = { limit, skip }
 
     if (category && category !== 'all') {
       params.category = category
@@ -21,6 +20,31 @@ export async function getProducts({ category = '', page = 1 } = {}) {
     throw new Error(
       error.response?.data?.message || 'Не удалось загрузить товары. Попробуйте позже.'
     )
+  }
+}
+
+export async function getAllProducts() {
+  try {
+    const allProducts = []
+    let skip = 0
+    const limit = 100
+    let hasMore = true
+
+    while (hasMore) {
+      const response = await axios.get(API_URL, { params: { limit, skip } })
+      const products = response.data.products
+      
+      if (products && products.length > 0) {
+        allProducts.push(...products)
+        skip += limit
+      }
+      
+      hasMore = products && products.length === limit
+    }
+
+    return allProducts
+  } catch {
+    throw new Error('Не удалось загрузить товары. Попробуйте позже.')
   }
 }
 

@@ -1,5 +1,5 @@
 import { useEffect, useState, useMemo } from 'react'
-import { getProducts, getCategories } from '../api/api'
+import { getAllProducts, getCategories } from '../api/api'
 import Filter from '../components/Filter'
 import Header from '../components/Header'
 import ProductList from '../components/ProductList'
@@ -40,8 +40,8 @@ function Home() {
     async function loadProducts() {
       try {
         setLoading(true)
-        const data = await getProducts({ page: 1 })
-        setAllProducts(data.products)
+        const products = await getAllProducts()
+        setAllProducts(products)
       } catch (err) {
         setError(err.message)
       } finally {
@@ -56,11 +56,9 @@ function Home() {
     return allProducts.filter((item) => item.category === selectedCategory)
   }, [allProducts, selectedCategory])
 
-  const paginatedProducts = useMemo(() => {
-    const start = (currentPage - 1) * ITEMS_PER_PAGE
-    const end = start + ITEMS_PER_PAGE
-    return filteredProducts.slice(start, end)
-  }, [filteredProducts, currentPage])
+  const indexOfLastItem = currentPage * ITEMS_PER_PAGE
+  const indexOfFirstItem = indexOfLastItem - ITEMS_PER_PAGE
+  const currentProducts = filteredProducts.slice(indexOfFirstItem, indexOfLastItem)
 
   const handleBuy = (product) => {
     addToCart(product)
@@ -109,7 +107,7 @@ function Home() {
         {error && !loading && <p className="state-message error">{error}</p>}
         {!loading && !error && (
           <>
-            <ProductList products={paginatedProducts} onBuy={handleBuy} animatedId={animatedId} />
+            <ProductList products={currentProducts} onBuy={handleBuy} animatedId={animatedId} />
             {filteredProducts.length > ITEMS_PER_PAGE && (
               <Pagination
                 currentPage={currentPage}
