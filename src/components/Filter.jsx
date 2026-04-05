@@ -1,12 +1,43 @@
 import Modal from './Modal'
 import './Filter.css'
 
+const CATEGORY_MAP = {
+  beauty: 'Косметика',
+  fragrances: 'Парфюмерия',
+  furniture: 'Мебель',
+  groceries: 'Продукты',
+  'home-decoration': 'Декор для дома',
+  'kitchen-accessories': 'Кухонные аксессуары',
+  laptops: 'Ноутбуки',
+  'mens-shirts': 'Мужские рубашки',
+  'mens-shoes': 'Мужская обувь',
+  'mens-watches': 'Мужские часы',
+  'mobile-accessories': 'Аксессуары для телефонов',
+  motorcycle: 'Мотоциклы',
+  'skin-care': 'Уход за кожей',
+  smartphones: 'Смартфоны',
+  'sports-accessories': 'Спортивные аксессуары',
+  sunglasses: 'Солнцезащитные очки',
+  tablets: 'Планшеты',
+  tops: 'Одежда',
+  vehicle: 'Транспорт',
+  'womens-bags': 'Женские сумки',
+  'womens-dresses': 'Женские платья',
+  'womens-jewellery': 'Украшения',
+  'womens-shoes': 'Женская обувь',
+  'womens-watches': 'Женские часы',
+}
+
+function translateCategory(slug) {
+  return CATEGORY_MAP[slug] || slug
+}
+
 function Filter({ isOpen, activeFilter, onToggle, onSelect, onApply, categories = [] }) {
   const OPTIONS = [
     { key: 'all', label: 'Все товары' },
     ...categories.map((cat) => ({
       key: cat.slug,
-      label: cat.name,
+      label: translateCategory(cat.slug),
     })),
   ]
 
@@ -25,19 +56,18 @@ function Filter({ isOpen, activeFilter, onToggle, onSelect, onApply, categories 
         </button>
 
         <Modal isOpen={isOpen}>
-          <ul className="filter-list">
+          <div className="filter-grid">
             {OPTIONS.map((option) => (
-              <li key={option.key}>
-                <button
-                  className={`filter-option ${activeFilter === option.key ? 'active' : ''}`}
-                  type="button"
-                  onClick={() => onSelect(option.key)}
-                >
-                  {option.label}
-                </button>
-              </li>
+              <button
+                key={option.key}
+                className={`filter-option ${activeFilter === option.key ? 'active' : ''}`}
+                type="button"
+                onClick={() => onSelect(option.key)}
+              >
+                {option.label}
+              </button>
             ))}
-          </ul>
+          </div>
         </Modal>
       </div>
 

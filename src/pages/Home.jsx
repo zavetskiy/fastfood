@@ -103,11 +103,13 @@ function Home() {
         {!loading && !error && (
           <>
             <ProductList products={products} onBuy={handleBuy} animatedId={animatedId} />
-            <Pagination 
-              currentPage={currentPage} 
-              totalItems={total} 
-              onPageChange={handlePageChange} 
-            />
+            {total > 12 && (
+              <Pagination 
+                currentPage={currentPage} 
+                totalItems={total} 
+                onPageChange={handlePageChange} 
+              />
+            )}
           </>
         )}
 
