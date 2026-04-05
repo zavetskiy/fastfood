@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useMemo } from 'react'
 import { getProducts, getCategories } from '../api/api'
 import Filter from '../components/Filter'
 import Header from '../components/Header'
@@ -8,15 +8,16 @@ import Pagination from '../components/Pagination'
 import { useCartStore } from '../store/cartStore'
 import './Home.css'
 
+const ITEMS_PER_PAGE = 12
+
 function Home() {
-  const [products, setProducts] = useState([])
-  const [total, setTotal] = useState(0)
+  const [allProducts, setAllProducts] = useState([])
   const [categories, setCategories] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [filterOpen, setFilterOpen] = useState(false)
-  const [activeFilter, setActiveFilter] = useState('all')
-  const [pendingFilter, setPendingFilter] = useState('all')
+  const [selectedCategory, setSelectedCategory] = useState('')
+  const [pendingCategory, setPendingCategory] = useState('')
   const [currentPage, setCurrentPage] = useState(1)
   const [animatedId, setAnimatedId] = useState(null)
   const [cartOpen, setCartOpen] = useState(false)
@@ -39,21 +40,27 @@ function Home() {
     async function loadProducts() {
       try {
         setLoading(true)
-        const data = await getProducts({ 
-          category: activeFilter === 'all' ? '' : activeFilter, 
-          page: currentPage 
-        })
-        setProducts(data.products)
-        setTotal(data.total)
+        const data = await getProducts({ page: 1 })
+        setAllProducts(data.products)
       } catch (err) {
         setError(err.message)
       } finally {
         setLoading(false)
       }
     }
-
     loadProducts()
-  }, [activeFilter, currentPage])
+  }, [])
+
+  const filteredProducts = useMemo(() => {
+    if (!selectedCategory) return allProducts
+    return allProducts.filter((item) => item.category === selectedCategory)
+  }, [allProducts, selectedCategory])
+
+  const paginatedProducts = useMemo(() => {
+    const start = (currentPage - 1) * ITEMS_PER_PAGE
+    const end = start + ITEMS_PER_PAGE
+    return filteredProducts.slice(start, end)
+  }, [filteredProducts, currentPage])
 
   const handleBuy = (product) => {
     addToCart(product)
@@ -61,13 +68,13 @@ function Home() {
     setTimeout(() => setAnimatedId(null), 350)
   }
 
-  const handleSelectFilter = (filterKey) => {
-    setPendingFilter(filterKey)
+  const handleSelectFilter = (categoryKey) => {
+    setPendingCategory(categoryKey)
     setFilterOpen(false)
   }
 
   const applyFilter = () => {
-    setActiveFilter(pendingFilter)
+    setSelectedCategory(pendingCategory)
     setCurrentPage(1)
   }
 
@@ -89,25 +96,25 @@ function Home() {
         <div className="toolbar">
           <Filter
             isOpen={filterOpen}
-            activeFilter={pendingFilter}
+            activeFilter={pendingCategory}
             onToggle={() => setFilterOpen((prev) => !prev)}
             onSelect={handleSelectFilter}
             onApply={applyFilter}
             categories={categories}
           />
-          <div className="total-box">Найдено: {total} товаров</div>
+          <div className="total-box">Найдено: {filteredProducts.length} товаров</div>
         </div>
 
         {loading && <p className="state-message">Загрузка товаров...</p>}
         {error && !loading && <p className="state-message error">{error}</p>}
         {!loading && !error && (
           <>
-            <ProductList products={products} onBuy={handleBuy} animatedId={animatedId} />
-            {total > 12 && (
-              <Pagination 
-                currentPage={currentPage} 
-                totalItems={total} 
-                onPageChange={handlePageChange} 
+            <ProductList products={paginatedProducts} onBuy={handleBuy} animatedId={animatedId} />
+            {filteredProducts.length > ITEMS_PER_PAGE && (
+              <Pagination
+                currentPage={currentPage}
+                totalItems={filteredProducts.length}
+                onPageChange={handlePageChange}
               />
             )}
           </>
@@ -116,8 +123,8 @@ function Home() {
         {cartOpen && (
           <div className="cart-panel-overlay" onClick={() => setCartOpen(false)}>
             <div className="cart-panel-inner" onClick={(e) => e.stopPropagation()}>
-              <CartPanel 
-                items={items} 
+              <CartPanel
+                items={items}
                 onClose={() => setCartOpen(false)}
                 onDecrease={decreaseItem}
                 onAdd={addToCart}
