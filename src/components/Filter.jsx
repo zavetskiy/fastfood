@@ -1,5 +1,4 @@
 import Modal from './Modal'
-import { getCategoryLabel } from '../api/api'
 import './Filter.css'
 
 function Filter({ isOpen, activeFilter, onToggle, onSelect, onApply, categories = [] }) {
@@ -7,7 +6,7 @@ function Filter({ isOpen, activeFilter, onToggle, onSelect, onApply, categories 
     { key: 'all', label: 'Все товары' },
     ...categories.map((cat) => ({
       key: cat.slug,
-      label: getCategoryLabel(cat.slug),
+      label: cat.name,
     })),
   ]
 
